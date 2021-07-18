@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice-app-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: microservice-app-demo
+  template:
+    metadata:
+      labels:
+        name: microservice-app-demo
+    spec:
+      containers:
+      - image: eu.gcr.io/admin-roava-io/roava.io/services/microservice-app-demo:@VERSION@
+        imagePullPolicy: Always
+        name: microservice-app-demo
+        ports:
+        - name: grpc-port
+          containerPort: 9090
+        - name: http-port 
+          containerPort: 8080
+        env:
+        - name: PORT
+          value: "9090"
+        - name: HTTP_PORT
+          value: "8080"
+        - name: HTTPPORT
+          value: "8080"
+        - name: SERVICE_NAME
+          value: microservice-app-demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: microservice-app-demo
+  name: microservice-app-demo
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      name: http-port
+      targetPort: 8080
+    - protocol: "TCP"
+      port: 9090
+      name: grpc-port
+      targetPort: 9090
+  selector:
+    name: microservice-app-demo
